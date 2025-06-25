@@ -4,7 +4,7 @@ const cors = require("cors");
 
 const app = express();
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 // Middleware
 app.use(cors());
@@ -63,6 +63,26 @@ async function run() {
         res.status(201).send(result);
       } catch (error) {
         res.status(500).send({ error: "Failed to add parcel" });
+      }
+    });
+
+    // DELETE /parcels/:id — Delete parcel by ObjectId
+    app.delete("/parcels/:id", async (req, res) => {
+      const id = req.params.id;
+      try {
+        const result = await parcelsCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+        if (result.deletedCount === 1) {
+          res
+            .status(200)
+            .send({ message: "Parcel deleted successfully", result });
+        } else {
+          res.status(404).send({ error: "Parcel not found" });
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to delete parcel" });
       }
     });
 
