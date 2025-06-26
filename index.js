@@ -30,12 +30,30 @@ async function run() {
     const parcelsCollection = db.collection("parcels");
 
     // GET: Get all parcels
-    app.get("/parcels", async (req, res) => {
+    // app.get("/parcels", async (req, res) => {
+    //   try {
+    //     const allParcels = await parcelsCollection.find().toArray();
+    //     res.status(200).send(allParcels);
+    //   } catch (error) {
+    //     res.status(500).send({ error: "Failed to fetch parcels" });
+    //   }
+    // });
+
+    // GET /parcels/:id — Get parcel by ID
+    app.get("/parcels/:id", async (req, res) => {
+      const id = req.params.id;
       try {
-        const allParcels = await parcelsCollection.find().toArray();
-        res.status(200).send(allParcels);
-      } catch (error) {
-        res.status(500).send({ error: "Failed to fetch parcels" });
+        const parcel = await parcelsCollection.findOne({
+          _id: new ObjectId(id),
+        });
+        if (parcel) {
+          res.status(200).send(parcel);
+        } else {
+          res.status(404).send({ error: "Parcel not found" });
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to fetch parcel" });
       }
     });
 
